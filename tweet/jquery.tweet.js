@@ -25,7 +25,7 @@
       auto_join_text_ing: " I am ",             // [string]   auto tense for present tense: "I was" surfing
       auto_join_text_reply: " I replied to ",   // [string]   auto tense for replies: "I replied to" @someone "with"
       auto_join_text_url: " I was looking at ", // [string]   auto tense for urls: "I was looking at" http:...
-      loading_text: null,                       // [string]   optional loading text, displayed while tweets load
+      loading_text: 'loading tweets...',                       // [string]   optional loading text, displayed while tweets load
       refresh_interval: null,                   // [integer]  optional number of seconds after which to reload tweets
       twitter_url: "twitter.com",               // [string]   custom twitter url, if any (apigee, etc.)
       twitter_api_url: "api.twitter.com",       // [string]   custom twitter api url, if any (apigee, etc.)
@@ -36,7 +36,16 @@
       },
       filter: function(tweet) {                 // [function] whether or not to include a particular tweet (be sure to also set 'fetch')
         return true;
-      }
+      },
+      just_now_text:"just now",
+      seconds_ago_text: "about %d seconds ago",
+      a_minutes_ago_text: "about a minute ago",
+      minutes_ago_text: "about %d minutes ago",
+      a_hours_ago_text: "about an hour ago",
+      hours_ago_text: "about %d hours ago",
+      a_day_ago_text: "about a day ago",
+      days_ago_text: "about %d days ago",
+      view_text: "view tweet on twitter"
       // You can attach callbacks to the following events using jQuery's standard .bind() mechanism:
       //   "loaded" -- triggered when tweets have been fetched and rendered
     }, o);
@@ -119,13 +128,13 @@
     }
 
     function format_relative_time(time_ago) {
-      if ( time_ago.days > 2 )     return 'about ' + time_ago.days + ' days ago';
-      if ( time_ago.hours > 24 )   return 'about a day ago';
-      if ( time_ago.hours > 2 )    return 'about ' + time_ago.hours + ' hours ago';
-      if ( time_ago.minutes > 45 ) return 'about an hour ago';
-      if ( time_ago.minutes > 2 )  return 'about ' + time_ago.minutes + ' minutes ago';
-      if ( time_ago.seconds > 1 )  return 'about ' + time_ago.seconds + ' seconds ago';
-      return 'just now';
+      if ( time_ago.days > 2 )     return s.days_ago_text.replace(/%d/,time_ago.days);
+      if ( time_ago.hours > 24 )   return s.a_day_ago_text;
+      if ( time_ago.hours > 2 )    return s.hours_ago_text.replace(/%d/,time_ago.hours);
+      if ( time_ago.minutes > 45 ) return s.a_hours_ago_text;
+      if ( time_ago.minutes > 2 )  return s.minutes_ago_text.replace(/%d/,time_ago.minute);
+      if ( time_ago.seconds > 1 )  return s.seconds_ago_text.replace(/%d/,time_ago.seconds);
+      return s.just_now_text;
     }
 
     function build_auto_join_text(text) {
