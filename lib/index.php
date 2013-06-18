@@ -1,13 +1,13 @@
 <?php
 
 require_once('twitterfeed/TwitterFeed.php');
-
 $config = include('config.php');
 
 $twitter = new TwitterFeed($config);
 
-$type = isset($_GET['type'])?$_GET['type']: false;
 
+
+$type = isset($_GET['type'])?$_GET['type']: false;
 switch ($type) {
 	case 'list':
 		$twitter->getList(array(
@@ -21,7 +21,7 @@ switch ($type) {
 		break;
 	case 'favorites':
 		$twitter->getFavorites(array(
-			'screen_name' => 'noradio',
+			'screen_name' => isset($_GET['screen_name'])?$_GET['screen_name']: '',
 			'count'   => isset($_GET['count'])?$_GET['count']: '',
 			'page'    => isset($_GET['page'])?$_GET['page']: '',
 		));
@@ -34,11 +34,10 @@ switch ($type) {
 			'include_rts' => isset($_GET['include_rts'])?$_GET['include_rts']: '',
 		));
 		break;
-
 	case 'search':
 		$twitter->getSearch(array(
 			'count'   => isset($_GET['count'])?$_GET['count']: '',
-			
+			//'page'    => isset($_GET['page'])?$_GET['page']: '',
 			'q' => isset($_GET['q'])?$_GET['q']: '',
 		));
 		break;
