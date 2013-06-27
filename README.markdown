@@ -7,12 +7,12 @@
 
 2. Configure `lib/config.php` file.
 
-3. with tweet scripts, give a twitter_oauth_url option relating to the `lib/index.php` file.
+3. with tweet scripts, give a twitter_api_proxy_url option relating to the `lib/index.php` file.
 
         <script type='text/javascript'>
             jQuery(function($){
                 $(".tweet").tweet({
-                    twitter_oauth_url: "lib/index.php"
+                    twitter_api_proxy_url: "lib/index.php"
                 });
             });
         </script>
