@@ -58,10 +58,7 @@ class TwitterFeed {
 		);
 		$parameters = array_merge($defaults, $parameters);
 		$tweets = $this->get('search/tweets.json', $parameters);
-
-		if(isset($tweets->statuses)){
-			$tweets = $tweets->statuses;
-		}
+		
 		echo json_encode($tweets);
 	}
 

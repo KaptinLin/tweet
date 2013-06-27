@@ -8,7 +8,7 @@
 }(function ($) {
   $.fn.tweet = function(o){
     var s = $.extend({
-      twitter_oauth_url: "../lib/index.php",               // [string]   custom twitter api script url 
+      twitter_api_proxy_url: null,              // [string]   (required) URL which proxies (with authentication) to api.twitter.com
       username: null,                           // [string or array] required unless using the 'query' option; one or more twitter screen names (use 'list' option for multiple names, where possible)
       list: null,                               // [string]   optional name of list belonging to username
       list_id: null,                            // [integer]  ID of list to fetch when using list functionality
@@ -85,7 +85,7 @@
       linkUser: replacer(/(^|[\W])@(\w+)/gi, "$1<span class=\"at\">@</span><a href=\"http://"+s.twitter_url+"/$2\">$2</a>"),
       // Support various latin1 (\u00**) and arabic (\u06**) alphanumeric chars
       linkHash: replacer(/(?:^| )[\#]+([\w\u00c0-\u00d6\u00d8-\u00f6\u00f8-\u00ff\u0600-\u06ff]+)/gi,
-                         ' <a href="https://twitter.com/search?q=%23$1&lang=all'+
+                         ' <a href="https://'+s.twitter_url+'/search?q=%23$1&src=hash&lang=all'+
                          ((s.username && s.username.length === 1 && !s.list) ? '&from='+s.username.join("%2BOR%2B") : '')+
                          '" class="tweet_hashtag">#$1</a>'),
       makeHeart: replacer(/(&lt;)+[3]/gi, "<tt class='heart'>&#x2665;</tt>")
@@ -155,14 +155,14 @@
       var count = (s.fetch === null) ? s.count : s.fetch;
       var common_params = '&include_entities=1';
       if (s.list) {
-        return s.twitter_oauth_url+'?type=list&owner_screen_name='+s.username[0]+'&list_id='+s.list_id+'&slug='+s.list+"&page="+s.page+"&count="+count+'&include_rts='+(s.retweets ? '&include_rts=1' : '')+common_params;
+        return s.twitter_api_proxy_url+'?type=list&owner_screen_name='+s.username[0]+'&list_id='+s.list_id+'&slug='+s.list+"&page="+s.page+"&count="+count+'&include_rts='+(s.retweets ? '&include_rts=1' : '')+common_params;
       } else if (s.favorites) {
-        return s.twitter_oauth_url+"?type=favorites&screen_name="+s.username[0]+"&page="+s.page+"&count="+count+common_params;
+        return s.twitter_api_proxy_url+"?type=favorites&screen_name="+s.username[0]+"&page="+s.page+"&count="+count+common_params;
       } else if (s.query === null && s.username.length === 1) {
-        return s.twitter_oauth_url+'?type=usertimeline&screen_name='+s.username[0]+'&count='+count+(s.retweets ? '&include_rts=1' : '')+'&page='+s.page+common_params;
+        return s.twitter_api_proxy_url+'?type=usertimeline&screen_name='+s.username[0]+'&count='+count+(s.retweets ? '&include_rts=1' : '')+'&page='+s.page+common_params;
       } else {
         var query = (s.query || 'from:'+s.username.join(' OR from:'));
-        return s.twitter_oauth_url+'?type=search&q='+encodeURIComponent(query)+'&count='+count+'&page='+s.page+common_params;
+        return s.twitter_api_proxy_url+'?type=search&q='+encodeURIComponent(query)+'&count='+count+'&page='+s.page+common_params;
       }
     }
 
@@ -252,7 +252,7 @@
           });
           return ;
         }
-        var tweets = $.map(data.results || data, extract_template_data);
+        var tweets = $.map(data.statuses || data, extract_template_data);
         tweets = $.grep(tweets, s.filter).sort(s.comparator).slice(0, s.count);
         $(widget).trigger("tweet:retrieved", [tweets]);
       });
@@ -262,6 +262,7 @@
       if(s.username && typeof(s.username) === "string"){
         s.username = [s.username];
       }
+
       $(widget).unbind("tweet:render").unbind("tweet:retrieved").unbind("tweet:load").
         bind({
           "tweet:load": function() { load(widget); },
